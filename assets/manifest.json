@@ -9,6 +9,12 @@
   "orientation": "natural",
   "prefer_related_applications": false,
   "icons": [
+    
+    {
+      "src": "icons/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
