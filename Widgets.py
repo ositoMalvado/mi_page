@@ -5,6 +5,7 @@ class CalculadoraPremio(ft.Container):
 
     def update_premio(self, e):
         # Aplicar el descuento del 15%
+        self.sonido.play()
         if self.text_field_premio.value == '':
             self.valor_final.value = "0"
             self.valor_final.update()
@@ -27,18 +28,26 @@ class CalculadoraPremio(ft.Container):
         self.slider.label = "Descuento: " + str(int(self.slider.value)) + "%"
         self.slider.update()
         self.update_premio(e)
+        self.sonido.play()
 
     def copy_premio(self, e):
+        self.copy_sound.play()
         self.page.set_clipboard(self.valor_final.value)
         self.sb_copiado.open = True
         self.page.update()
 
     def did_mount(self):
         self.page.overlay.append(self.sb_copiado)
+        self.page.overlay.append(self.sonido)
+        self.page.overlay.append(self.copy_sound)
+        self.page.update()
         return super().did_mount()
 
     def __init__(self):
         super().__init__()
+
+        self.sonido = ft.Audio(src="bamboo.mp3")
+        self.copy_sound = ft.Audio(src="copy.mp3")
 
         self.sb_copiado = ft.SnackBar(
             content=ft.Text("Copiado al portapapeles"),
@@ -56,13 +65,18 @@ class CalculadoraPremio(ft.Container):
             label="Descuento: 15%",
         )
 
-        self.valor_final = ft.Text("0", size=30)
+        self.valor_final = ft.Text("0", size=40, expand=True, text_align=ft.TextAlign.CENTER)
 
         self.text_field_premio = ft.TextField(
             label="Premio",
             prefix_icon=ft.icons.ATTACH_MONEY_ROUNDED,
             hint_text="Ingresa el premio",
-            on_change=self.update_premio
+            on_change=self.update_premio,
+            input_filter=ft.InputFilter(
+                regex_string=r"[0-9]",
+                allow=True,
+                replacement_string="",
+            )
         )
         self.boton_copiar = ft.ElevatedButton(
             content=ft.Row(

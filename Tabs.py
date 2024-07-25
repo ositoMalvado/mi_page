@@ -18,11 +18,12 @@ class TabFederacionFranquicias(ft.Tab):
         self.text = "Franquicias"
         self.mi_data_table = ft.DataTable(
             columns=[
-                ft.DataColumn(ft.Text("Tipo de Vehículo", weight=ft.FontWeight.BOLD), tooltip="Tipo de Vehículo"),
-                ft.DataColumn(ft.Text("% Suma Asegurada", weight=ft.FontWeight.BOLD), tooltip="% Suma Asegurada"),
-                ft.DataColumn(ft.Text("Monto mínimo de Franquicia", weight=ft.FontWeight.BOLD), tooltip="Monto mínimo de Franquicia"),
+                ft.DataColumn(ft.Text(expand=True,value="Tipo de Vehículo", weight=ft.FontWeight.BOLD), tooltip="Tipo de Vehículo"),
+                ft.DataColumn(ft.Text(expand=True,value="% Suma Asegurada", weight=ft.FontWeight.BOLD), tooltip="% Suma Asegurada"),
+                ft.DataColumn(ft.Text(expand=True,value="Monto mínimo de Franquicia", weight=ft.FontWeight.BOLD), tooltip="Monto mínimo de Franquicia"),
             ],
             rows=[],
+            expand=True,
         )
 
         for i, franquicia in enumerate(self.franquicias):

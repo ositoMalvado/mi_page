@@ -25,7 +25,7 @@ def main(page: ft.Page):
 
     page.add(
         ft.Tabs(
-            [
+            tabs=[
                 ft.Tab(
                     text="Federación Patronal",
                     content=ft.Tabs(
@@ -67,4 +67,4 @@ def main(page: ft.Page):
 
 
 
-ft.app(main, assets_dir="assets", view=ft.AppView.WEB_BROWSER)
+ft.app(main, assets_dir="assets")
