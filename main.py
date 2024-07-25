@@ -5,22 +5,21 @@ import random
 
 def main(page: ft.Page):
 
+    page.fonts = {
+        "GasoekOne": github_to_raw("https://github.com/chrisbull/font-collection/blob/master/Circular/CircularStd-Medium.ttf")
+    }
+
+    page.theme = ft.Theme(font_family="GasoekOne")
+    page.title = "Utilidades Oficina"
+
+
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.padding = 0
     
-    page.fonts = {
-        "Sans": github_to_raw("https://github.com/chrisbull/font-collection/raw/master/GoogleSans/GoogleSans-Regular.ttf")
-    }
-
-    page.theme = ft.Theme(
-        font_family="Sans"
-    )
 
     def change_color():
         random_color = "#%02x%02x%02x" % (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        page.theme = ft.Theme(
-            color_scheme_seed=random_color
-        )
+        page.theme.color_scheme_seed = random_color
         page.update()
     change_color()
 
