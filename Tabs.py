@@ -102,8 +102,8 @@ class TabGeneralPatentes(ft.Tab):
         self.text = "Año de auto por patente"
         self.mi_data_table = ft.DataTable(
             columns=[
-                ft.DataColumn(ft.Text("Patente", weight=ft.FontWeight.BOLD), tooltip="Patente"),
-                ft.DataColumn(ft.Text("Año", weight=ft.FontWeight.BOLD), tooltip="Año"),
+                ft.DataColumn(ft.Text("Patente", size=24, weight=ft.FontWeight.BOLD), tooltip="Patente"),
+                ft.DataColumn(ft.Text("Año", size=24, weight=ft.FontWeight.BOLD), tooltip="Año"),
             ],
             rows=[],
         )
@@ -111,8 +111,8 @@ class TabGeneralPatentes(ft.Tab):
             self.mi_data_table.rows.append(
                 ft.DataRow(
                     cells=[
-                        ft.DataCell(ft.Text(patente, weight=ft.FontWeight.BOLD)),
-                        ft.DataCell(ft.Text(self.patentes[patente])),
+                        ft.DataCell(ft.Text(patente, weight=ft.FontWeight.BOLD, size=24)),
+                        ft.DataCell(ft.Text(self.patentes[patente], size=24)),
                     ],
                     color=ft.colors.BLACK12 if i % 2 == 0 else None
                 )

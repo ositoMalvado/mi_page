@@ -1,19 +1,28 @@
 import flet as ft
 import math
+import random
 class CalculadoraPremio(ft.Container):
 
 
     def update_premio(self, e):
         # Aplicar el descuento del 15%
         self.sonido.play()
-        if self.text_field_premio.value == '':
-            self.valor_final.value = "0"
-            self.valor_final.update()
-            return
+        if e.control.data == "descuento":
+            if self.text_field_premio.value == '':
+                self.valor_final.value = "0"
+                self.valor_final.update()
+                return
+        else:
+            self.intervalo_display.value = "$" + str(int(self.intervalo_slider.value))
+            self.intervalo_display.update()
+            if self.text_field_premio.value == '':
+                return
+
         discounted_value = int(float(self.text_field_premio.value) * (1 - self.descuento / 100))
         
+        intervalo = int(self.intervalo_slider.value)
         # Redondear al múltiplo de 300 más cercano, siempre hacia arriba
-        rounded_value = int(math.ceil(discounted_value / 300) * 300)
+        rounded_value = int(math.ceil(discounted_value / intervalo) * intervalo)
 
         # Asegurarse de que el valor redondeado no sea menor que el valor descontado
         final_value = max(rounded_value, math.ceil(discounted_value))
@@ -25,8 +34,12 @@ class CalculadoraPremio(ft.Container):
         self.descuento = self.slider.value
         self.descuento_display.value = str(int(self.slider.value)) + "%"
         self.descuento_display.update()
-        self.slider.label = "Descuento: " + str(int(self.slider.value)) + "%"
-        self.slider.update()
+        if e.control.data == "descuento":
+            self.slider.label = "Descuento: " + str(int(self.slider.value)) + "%"
+            self.slider.update()
+        else:
+            self.intervalo_slider.label = "Intervalo: $" + str(int(self.intervalo_slider.value))
+            self.intervalo_slider.update()
         self.update_premio(e)
         self.sonido.play()
 
@@ -63,6 +76,7 @@ class CalculadoraPremio(ft.Container):
             divisions=15,
             on_change=self.slider_handle,
             label="Descuento: 15%",
+            data="descuento",
         )
 
         self.valor_final = ft.Text("0", size=40, expand=True, text_align=ft.TextAlign.CENTER)
@@ -71,6 +85,17 @@ class CalculadoraPremio(ft.Container):
             label="Premio",
             prefix_icon=ft.icons.ATTACH_MONEY_ROUNDED,
             hint_text="Ingresa el premio",
+            height=100,
+            content_padding=ft.padding.all(5),
+            text_style=ft.TextStyle(
+                size=35,
+            ),
+            hint_style=ft.TextStyle(
+                size=35,
+            ),
+            label_style=ft.TextStyle(
+                size=20,
+            ),
             on_change=self.update_premio,
             input_filter=ft.InputFilter(
                 regex_string=r"[0-9]",
@@ -92,26 +117,77 @@ class CalculadoraPremio(ft.Container):
 
         self.descuento_display = ft.Text(str(self.descuento) + "%", weight=ft.FontWeight.BOLD, size=20)
 
+        self.intervalo = 300
+        self.intervalo_slider = ft.Slider(
+            value=self.intervalo,
+            min=0,
+            max=1000,
+            divisions=20, # i need each division be by 50
+            on_change=self.slider_handle,
+            label="Intervalo: 300",
+            data="intervalo"
+        )
+        self.intervalo_display = ft.Text("$" + str(self.intervalo), weight=ft.FontWeight.BOLD, size=20)
+
         self.content = ft.Column(
             controls=[
                 ft.Text("Calculadora de Premio", size=30, weight=ft.FontWeight.BOLD),
                 self.text_field_premio,
                 ft.Row(
                     [
-                        ft.Text("Descuento: ", weight=ft.FontWeight.BOLD),
+                        ft.Text("Descuento: ", weight=ft.FontWeight.BOLD, size=18),
                         self.descuento_display,
                     ]
                 ),
                 self.slider,
-                ft.Text("Premio con descuento: ", weight=ft.FontWeight.BOLD),
+                ft.Row(
+                    [
+                        ft.Text("Intervalo: ", weight=ft.FontWeight.BOLD, size=18),
+                        self.intervalo_display,
+                    ]
+                ),
+                self.intervalo_slider,
+                ft.Text("Premio con descuento: ", weight=ft.FontWeight.BOLD, size=18),
                 self.boton_copiar
-            ]
+            ],
+            spacing=2,
         )
         self.border_radius=10
         self.border=ft.border.all(1, ft.colors.BLACK12)
         self.bgcolor=ft.colors.PRIMARY_CONTAINER
         self.width=500
         self.padding=10
+
+
+class ColorButton(ft.IconButton):
+
+    def change_color(self, e):
+        random_color = "#%02x%02x%02x" % (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.page.theme.color_scheme_seed = random_color
+        self.page.update()
+
+    def __init__(self):
+        super().__init__()
+        self.icon = ft.icons.PALETTE_ROUNDED
+        self.tooltip = "Cambiar color"
+        self.on_click = self.change_color
+    
+
+
+class ThemeButton(ft.IconButton):
+
+    def change_theme(self, e):
+        self.page.theme_mode = (
+            ft.ThemeMode.DARK if self.page.theme_mode == ft.ThemeMode.LIGHT else ft.ThemeMode.LIGHT
+        )
+        self.icon = ft.icons.LIGHT_MODE_ROUNDED if self.page.theme_mode == ft.ThemeMode.DARK else ft.icons.DARK_MODE_ROUNDED
+        self.page.update()
+
+    def __init__(self):
+        super().__init__()
+        self.icon = ft.icons.DARK_MODE_ROUNDED
+        self.tooltip = "Modo oscuro"
+        self.on_click = self.change_theme
 
 
 def main(page: ft.Page):
