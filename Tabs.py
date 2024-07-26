@@ -1,5 +1,6 @@
 import flet as ft
 from Widgets import CalculadoraPremio
+from Widgets import Zoomtainer
 
 class TabFederacionFranquicias(ft.Tab):
 
@@ -18,9 +19,9 @@ class TabFederacionFranquicias(ft.Tab):
         self.text = "Franquicias"
         self.mi_data_table = ft.DataTable(
             columns=[
-                ft.DataColumn(ft.Text(expand=True,value="Tipo de Vehículo", weight=ft.FontWeight.BOLD), tooltip="Tipo de Vehículo"),
-                ft.DataColumn(ft.Text(expand=True,value="% Suma Asegurada", weight=ft.FontWeight.BOLD), tooltip="% Suma Asegurada"),
-                ft.DataColumn(ft.Text(expand=True,value="Monto mínimo de Franquicia", weight=ft.FontWeight.BOLD), tooltip="Monto mínimo de Franquicia"),
+                ft.DataColumn(ft.Text(size=24,expand=True,value="Tipo de Vehículo", weight=ft.FontWeight.BOLD), tooltip="Tipo de Vehículo"),
+                ft.DataColumn(ft.Text(size=24,expand=True,value="% Suma Asegurada", weight=ft.FontWeight.BOLD), tooltip="% Suma Asegurada"),
+                ft.DataColumn(ft.Text(size=24,expand=True,value="Monto mínimo de Franquicia", weight=ft.FontWeight.BOLD), tooltip="Monto mínimo de Franquicia"),
             ],
             rows=[],
             expand=True,
@@ -30,9 +31,9 @@ class TabFederacionFranquicias(ft.Tab):
             self.mi_data_table.rows.append(
                 ft.DataRow(
                     cells=[
-                        ft.DataCell(ft.Text(franquicia["tipo"], weight=ft.FontWeight.BOLD)),
-                        ft.DataCell(ft.Text(franquicia["porcentaje"])),
-                        ft.DataCell(ft.Text(franquicia["Monto"])),
+                        ft.DataCell(Zoomtainer(ft.Text(franquicia["tipo"], weight=ft.FontWeight.BOLD,size=20), zoom=1.5)),
+                        ft.DataCell(Zoomtainer(ft.Text(franquicia["porcentaje"],size=20), zoom=1.5)),
+                        ft.DataCell(Zoomtainer(ft.Text(franquicia["Monto"],size=20), zoom=1.5)),
                     ],
                     color=ft.colors.BLACK12 if i % 2 == 0 else None
                 )
@@ -102,8 +103,8 @@ class TabGeneralPatentes(ft.Tab):
         self.text = "Año de auto por patente"
         self.mi_data_table = ft.DataTable(
             columns=[
-                ft.DataColumn(ft.Text("Patente", size=24, weight=ft.FontWeight.BOLD), tooltip="Patente"),
-                ft.DataColumn(ft.Text("Año", size=24, weight=ft.FontWeight.BOLD), tooltip="Año"),
+                ft.DataColumn(ft.Text("Patente", size=20, weight=ft.FontWeight.BOLD), tooltip="Patente"),
+                ft.DataColumn(ft.Text("Año", size=20, weight=ft.FontWeight.BOLD), tooltip="Año"),
             ],
             rows=[],
         )
@@ -111,8 +112,8 @@ class TabGeneralPatentes(ft.Tab):
             self.mi_data_table.rows.append(
                 ft.DataRow(
                     cells=[
-                        ft.DataCell(ft.Text(patente, weight=ft.FontWeight.BOLD, size=24)),
-                        ft.DataCell(ft.Text(self.patentes[patente], size=24)),
+                        ft.DataCell(Zoomtainer(ft.Text(patente, weight=ft.FontWeight.BOLD, size=14), zoom=1.2)),
+                        ft.DataCell(Zoomtainer(ft.Text(self.patentes[patente], size=14), zoom=1.2)),
                     ],
                     color=ft.colors.BLACK12 if i % 2 == 0 else None
                 )

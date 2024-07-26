@@ -1,22 +1,41 @@
 import flet as ft
 import math
 import random
+
+
+
+class Zoomtainer(ft.Container):
+
+
+    def zoom_hover(self, e):
+        self.scale = self.zoom if e.data == "true" else 1
+        self.update()
+
+
+    def __init__(self, contenido, zoom):
+        super().__init__()
+        self.content = contenido
+        self.scale = 1
+        self.zoom = zoom
+        self.animate_scale = ft.Animation(duration=100, curve=ft.AnimationCurve.FAST_OUT_SLOWIN)
+        self.on_hover = self.zoom_hover    
+
+
 class CalculadoraPremio(ft.Container):
 
 
     def update_premio(self, e):
         # Aplicar el descuento del 15%
         self.sonido.play()
-        if e.control.data == "descuento":
-            if self.text_field_premio.value == '':
-                self.valor_final.value = "0"
-                self.valor_final.update()
+        if self.text_field_premio.value == '':
+            self.valor_final.value = "0"
+            self.valor_final.update()
+            if e.control.data == "descuento":
                 return
-        else:
-            self.intervalo_display.value = "$" + str(int(self.intervalo_slider.value))
-            self.intervalo_display.update()
-            if self.text_field_premio.value == '':
-                return
+        self.intervalo_display.value = "$" + str(int(self.intervalo_slider.value))
+        self.intervalo_display.update()
+        if self.text_field_premio.value == '':
+            return
 
         discounted_value = int(float(self.text_field_premio.value) * (1 - self.descuento / 100))
         
@@ -85,20 +104,20 @@ class CalculadoraPremio(ft.Container):
             label="Premio",
             prefix_icon=ft.icons.ATTACH_MONEY_ROUNDED,
             hint_text="Ingresa el premio",
-            height=100,
+            # height=100,
             content_padding=ft.padding.all(5),
             text_style=ft.TextStyle(
-                size=35,
+                size=24,
             ),
             hint_style=ft.TextStyle(
-                size=35,
+                size=24,
             ),
             label_style=ft.TextStyle(
-                size=20,
+                size=24,
             ),
             on_change=self.update_premio,
-            input_filter=ft.InputFilter(
-                regex_string=r"[0-9]",
+            input_filter = ft.InputFilter(
+                regex_string=r"[1-9][0-9]*",
                 allow=True,
                 replacement_string="",
             )
@@ -130,6 +149,7 @@ class CalculadoraPremio(ft.Container):
         self.intervalo_display = ft.Text("$" + str(self.intervalo), weight=ft.FontWeight.BOLD, size=20)
 
         self.content = ft.Column(
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.Text("Calculadora de Premio", size=30, weight=ft.FontWeight.BOLD),
                 self.text_field_premio,
@@ -171,7 +191,9 @@ class ColorButton(ft.IconButton):
         self.icon = ft.icons.PALETTE_ROUNDED
         self.tooltip = "Cambiar color"
         self.on_click = self.change_color
-    
+
+
+
 
 
 class ThemeButton(ft.IconButton):
