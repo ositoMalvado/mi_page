@@ -48,7 +48,8 @@ def main(page: ft.Page):
                             text="General",
                             content=ft.Tabs(
                                 [
-                                    TabGeneralPatentes()
+                                    TabGeneralPatentes(),
+                                    TabGeneralCobranza()
                                 ],
                                 tab_alignment=ft.TabAlignment.CENTER,
                                 expand=True,

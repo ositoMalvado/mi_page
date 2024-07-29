@@ -34,6 +34,8 @@ class CalculadoraPremio(ft.Container):
                 return
         self.intervalo_display.value = "$" + str(int(self.intervalo_slider.value))
         self.intervalo_display.update()
+        self.cuotas_display.value = str(int(self.cuotas_slider.value))
+        self.cuotas_display.update()
         if self.text_field_premio.value == '':
             return
 
@@ -45,18 +47,24 @@ class CalculadoraPremio(ft.Container):
 
         # Asegurarse de que el valor redondeado no sea menor que el valor descontado
         final_value = max(rounded_value, math.ceil(discounted_value))
-            
-        self.valor_final.value = str(int(final_value))
+        self.premio_display.value = "$" + str(int(final_value))
+        self.premio_display.update()
+        self.valor_final.value = str(int(self.cuotas)) + " cuotas de " + str(int(final_value/self.cuotas))
         self.valor_final.update()
 
     def slider_handle(self, e):
-        self.descuento = self.slider.value
-        self.descuento_display.value = str(int(self.slider.value)) + "%"
-        self.descuento_display.update()
         if e.control.data == "descuento":
-            self.slider.label = "Descuento: " + str(int(self.slider.value)) + "%"
+            self.descuento = self.slider.value
+            self.descuento_display.value = str(int(self.descuento)) + "%"
+            self.descuento_display.update()
+            self.slider.label = "Descuento: " + str(int(self.descuento)) + "%"
             self.slider.update()
+        elif e.control.data == "cuotas":
+            self.cuotas = self.cuotas_slider.value
+            self.cuotas_slider.label = "Cuotas: " + str(int(self.cuotas))
+            self.cuotas_slider.update()
         else:
+            self.intervalo = self.intervalo_slider.value
             self.intervalo_slider.label = "Intervalo: $" + str(int(self.intervalo_slider.value))
             self.intervalo_slider.update()
         self.update_premio(e)
@@ -98,7 +106,7 @@ class CalculadoraPremio(ft.Container):
             data="descuento",
         )
 
-        self.valor_final = ft.Text("0", size=40, expand=True, text_align=ft.TextAlign.CENTER)
+        self.valor_final = ft.Text("0", expand=True, text_align=ft.TextAlign.CENTER)
 
         self.text_field_premio = ft.TextField(
             label="Premio",
@@ -106,15 +114,6 @@ class CalculadoraPremio(ft.Container):
             hint_text="Ingresa el premio",
             # height=100,
             content_padding=ft.padding.all(5),
-            text_style=ft.TextStyle(
-                size=24,
-            ),
-            hint_style=ft.TextStyle(
-                size=24,
-            ),
-            label_style=ft.TextStyle(
-                size=24,
-            ),
             on_change=self.update_premio,
             input_filter = ft.InputFilter(
                 regex_string=r"[1-9][0-9]*",
@@ -134,7 +133,7 @@ class CalculadoraPremio(ft.Container):
             on_click=self.copy_premio,
         )
 
-        self.descuento_display = ft.Text(str(self.descuento) + "%", weight=ft.FontWeight.BOLD, size=20)
+        self.descuento_display = ft.Text(str(self.descuento) + "%", weight=ft.FontWeight.BOLD)
 
         self.intervalo = 300
         self.intervalo_slider = ft.Slider(
@@ -146,28 +145,54 @@ class CalculadoraPremio(ft.Container):
             label="Intervalo: 300",
             data="intervalo"
         )
-        self.intervalo_display = ft.Text("$" + str(self.intervalo), weight=ft.FontWeight.BOLD, size=20)
+        self.intervalo_display = ft.Text("$" + str(self.intervalo), weight=ft.FontWeight.BOLD)
+
+        self.cuotas = 3
+        self.cuotas_display = ft.Text(str(self.cuotas), weight=ft.FontWeight.BOLD)
+        self.premio_display = ft.Text("$0", weight=ft.FontWeight.BOLD)
+        self.cuotas_slider = ft.Slider(
+            value=self.cuotas,
+            min=1,
+            max=6,
+            divisions=5,
+            on_change=self.slider_handle,
+            label="Cuotas: " + str(self.cuotas),
+            data="cuotas"
+        )
 
         self.content = ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Text("Calculadora de Premio", size=30, weight=ft.FontWeight.BOLD),
+                ft.Text("Calculadora de Premio", weight=ft.FontWeight.BOLD),
                 self.text_field_premio,
                 ft.Row(
                     [
-                        ft.Text("Descuento: ", weight=ft.FontWeight.BOLD, size=18),
+                        ft.Text("Descuento: ", weight=ft.FontWeight.BOLD),
                         self.descuento_display,
                     ]
                 ),
                 self.slider,
                 ft.Row(
                     [
-                        ft.Text("Intervalo: ", weight=ft.FontWeight.BOLD, size=18),
+                        ft.Text("Intervalo: ", weight=ft.FontWeight.BOLD),
                         self.intervalo_display,
                     ]
                 ),
                 self.intervalo_slider,
-                ft.Text("Premio con descuento: ", weight=ft.FontWeight.BOLD, size=18),
+                ft.Row(
+                    [
+                        ft.Text("Cuotas: ", weight=ft.FontWeight.BOLD),
+                        self.cuotas_display,
+                    ]
+                ),
+                self.cuotas_slider,
+                
+                ft.Row(
+                    [
+                        ft.Text("Premio con descuento: ", weight=ft.FontWeight.BOLD),
+                        self.premio_display,
+                    ]
+                ),
                 self.boton_copiar
             ],
             spacing=2,
