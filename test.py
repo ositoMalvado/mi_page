@@ -12,6 +12,11 @@ class DateTimePicker(ft.Container):
     def get_date(self):
         return self.date_picker.value
 
+    def set_date(self, date):
+        self.time_init = date
+        self.button_date_picker.text = date.strftime(self.date_format)
+        self.page.update()
+
     def date_handler(self, e):
         print(e.control.value)
         if self.date_time_on_button:
@@ -61,9 +66,10 @@ class DateTimePicker(ft.Container):
         self.date_time_on_button = date_time_on_button
         self.data = data
         self.expand = expand
+        self.time_init = time_init
         self.timer_picker = ft.TimePicker(
             on_change=self.time_handler,
-            value=time_init,
+            value=self.time_init,
         )
         self.date_picker = ft.DatePicker(
             on_change=self.date_handler,
@@ -129,9 +135,18 @@ class DateTimePicker(ft.Container):
 
 class PlanillaRow(ft.DataRow):
 
+
+    def eliminar(self, e):
+        if self.call_eliminar:
+            self.call_eliminar(self)
+
+    def editar(self, e):
+        if self.call_editar:
+            self.call_editar(self)
+
     def __init__(
         self,
-        fecha: str,
+        fecha: datetime,
         compañía: str,
         ramo: str,
         poliza: str,
@@ -152,15 +167,32 @@ class PlanillaRow(ft.DataRow):
         self.call_eliminar = call_eliminar
         self.call_editar = call_editar
         self.call_guardar = call_guardar
+
+        self.boton_editar = ft.IconButton(
+            icon=ft.icons.EDIT_ROUNDED,
+            tooltip="Editar",
+            on_click=self.editar
+        )
+        self.boton_eliminar = ft.IconButton(
+            icon=ft.icons.DELETE_ROUNDED,
+            tooltip="Eliminar",
+            on_click=self.eliminar
+        )
+        self.row_acciones = ft.Row(
+            [
+                self.boton_editar,
+                self.boton_eliminar
+            ]
+        )
         self.cells = [
-            ft.DataCell(ft.Text(fecha)),
+            ft.DataCell(ft.Text(fecha.strftime("%d/%m/%Y"))),
             ft.DataCell(ft.Text(compañía)),
             ft.DataCell(ft.Text(ramo)),
             ft.DataCell(ft.Text(poliza)),
             ft.DataCell(ft.Text(asegurado)),
             ft.DataCell(ft.Text(cobrado)),
             ft.DataCell(ft.Text(diferencia)),
-            ft.DataCell(ft.Text("acciones")),
+            ft.DataCell(self.row_acciones),
         ]
         super().__init__(cells=self.cells)
 
@@ -179,6 +211,24 @@ class PlanillaCobranza(ft.Container):
             self.iconbutton_add_min.tooltip = "Positivo"
         self.iconbutton_container.update()
 
+    def call_eliminar(self, e):
+        self.data_table.rows.remove(e)
+        self.data_table.update()
+        self.update_totales()
+    def call_editar(self, e):
+        # pass
+        self.fecha_picker.set_date(e.fecha)
+        self.drop_compañía.value = e.compañía
+        self.drop_ramo.value = e.ramo
+        self.poliza.value = e.poliza
+        self.asegurado.value = e.asegurado
+        self.dinero_cobrado.value = e.cobrado
+        self.dinero_diferencia.value = e.diferencia
+        self.iconbutton_add_min.icon = ft.icons.HORIZONTAL_RULE_ROUNDED if e.diferencia.startswith("-") else ft.icons.ADD_ROUNDED
+        self.iconbutton_container.bgcolor = ft.colors.RED_200 if e.diferencia.startswith("-") else ft.colors.GREEN_200
+        self.update()
+    def call_guardar(self, e):
+        pass
 
     def on_boton_agregar_click(self, e):
         for campo_obligatorio in self.datos_obligatorios:
@@ -190,13 +240,16 @@ class PlanillaCobranza(ft.Container):
         dinero_diferencia = self.dinero_diferencia.value if self.dinero_diferencia.value else 0
         self.data_table.rows.append(
             PlanillaRow(
-                self.fecha_picker.get_date().strftime("%d/%m/%Y"),
+                self.fecha_picker.get_date(),
                 self.drop_compañía.value,
                 self.drop_ramo.value,
                 self.poliza.value,
                 self.asegurado.value,
                 self.dinero_cobrado.value,
                 f"-{dinero_diferencia}" if self.iconbutton_add_min.icon == ft.icons.HORIZONTAL_RULE_ROUNDED else f"{dinero_diferencia}",
+                self.call_eliminar,
+                self.call_editar,
+                self.call_guardar
             )
         )
         self.data_table.update()
@@ -210,7 +263,7 @@ class PlanillaCobranza(ft.Container):
             total += int(float(row.cobrado))
             total_diferencia += int(float(row.diferencia))
         self.floating_total.text = f"${total}"
-        self.floating_total_diferencia.text = f"${total_diferencia}"
+        self.floating_total_diferencia.text = f"${total_diferencia+total}"
         self.floating_total.update()
         self.floating_total_diferencia.update()
 
@@ -224,7 +277,8 @@ class PlanillaCobranza(ft.Container):
         self.padding=5
         self.border_radius = 5
         self.border = ft.border.all(1, ft.colors.BLACK12)
-        self.fecha_picker = DateTimePicker(expand=False, altor=47)
+        self.altura_row = 48
+        self.fecha_picker = DateTimePicker(expand=False, altor=self.altura_row)
         self.drop_compañía = ft.Dropdown(
             label="Compañía",
             padding=0,
@@ -235,7 +289,8 @@ class PlanillaCobranza(ft.Container):
                 ft.dropdown.Option("Galeno"),
                 ft.dropdown.Option("Orbis"),
             ],
-            expand=True
+            expand=True,
+            height=self.altura_row
         )
         self.drop_ramo = ft.Dropdown(
             label="Ramo",
@@ -248,7 +303,8 @@ class PlanillaCobranza(ft.Container):
                 ft.dropdown.Option("Casa"),
                 ft.dropdown.Option("Incendio"),
             ],
-            expand=True
+            expand=True,
+            height=self.altura_row,
         )
         
         self.poliza = ft.TextField(
@@ -259,7 +315,7 @@ class PlanillaCobranza(ft.Container):
                 replacement_string="",
             ),
             expand=True,
-            height=48
+            height=self.altura_row
         )
 
         self.dinero_cobrado = ft.TextField(
@@ -271,7 +327,7 @@ class PlanillaCobranza(ft.Container):
                 replacement_string="",
             ),
             expand=True,
-            height=48
+            height=self.altura_row
         )
 
 
@@ -287,9 +343,9 @@ class PlanillaCobranza(ft.Container):
             self.iconbutton_add_min,
             bgcolor=ft.colors.GREEN_200,
             border_radius=100,
-            margin=ft.margin.only(top=5),
-            width=40,
-            height=40
+            # margin=ft.margin.only(top=5),
+            # width=40,
+            # height=40
         )
 
         self.dinero_diferencia = ft.TextField(
@@ -302,11 +358,14 @@ class PlanillaCobranza(ft.Container):
                 replacement_string="",
             ),
             expand=True,
-            height=48
+            height=self.altura_row
         )
         self.asegurado = ft.TextField(
             label="Asegurado",
             expand=True,
+            height=self.altura_row,
+            capitalization=ft.TextCapitalization.WORDS,
+
         )
 
         self.datos_obligatorios = [
