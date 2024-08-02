@@ -47,6 +47,8 @@ class CalculadoraPremio(ft.Container):
 
         # Asegurarse de que el valor redondeado no sea menor que el valor descontado
         final_value = max(rounded_value, math.ceil(discounted_value))
+        self.copy_value = final_value
+        print(self.copy_value)
         self.premio_display.value = "$" + str(int(final_value))
         self.premio_display.update()
         self.valor_final.value = str(int(self.cuotas)) + " cuotas de " + str(int(final_value/self.cuotas))
@@ -72,7 +74,8 @@ class CalculadoraPremio(ft.Container):
 
     def copy_premio(self, e):
         self.copy_sound.play()
-        self.page.set_clipboard(self.valor_final.value)
+        
+        self.page.set_clipboard(str(self.copy_value))
         self.sb_copiado.open = True
         self.page.update()
 
@@ -95,6 +98,7 @@ class CalculadoraPremio(ft.Container):
         )
 
         self.descuento = 15
+        self.copy_value = 0
 
         self.slider = ft.Slider(
             value=self.descuento,
